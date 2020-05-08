@@ -1,8 +1,12 @@
+import smtplib
+from email.mime.text import MIMEText
+
 from bs4 import BeautifulSoup
 import urllib.request
 
-from Main import main
 from Book import Book
+import os
+import getpass
 
 
 def CreateBook(title):
@@ -45,19 +49,41 @@ class Library(object):
             for book in self.recommended_books:
                 print(book.toString())
 
+    def getText(self):
+        resutl = ""
+        if len(self.recommended_books) == 0:
+            resutl = "No books added to the Library"
+        else:
+            for book in self.recommended_books:
+                resutl += book.toString() + "\n"
+        return resutl
+
     def save_Books(self):
         textFile = open('recommendedbooks.txt', 'w')
         for b in self.recommended_books:
             textFile.write(b.formatUpload() + "\n")
         textFile.close()
 
+    def send_email(self):
+        os.environ['MAIL_PASSWORD'] = 'Elvatera2'
+
+        message = self.getText()
+        gmail_user = input("User: ")
+        gmail_password = getpass.getpass()
+        text_type = 'plain'  # or 'html'
+        msg = MIMEText(message, text_type, 'utf-8')
+        msg['Subject'] = 'Recommended books'
+        msg['From'] = gmail_user
+        msg['To'] = gmail_user
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        server.login(gmail_user, gmail_password)
+        server.send_message(msg)
+        server.quit()
+
     def __preLoadedBooks(self):
         textFile = open('recommendedbooks.txt', 'r')
         books = textFile.read().split("\n")
-        print(books)
         for b in books:
             content = b.split(",")
             if len(content) == 3:
                 self.recommended_books.append(Book(content[0], content[1].strip(), content[2].strip()))
-
-
