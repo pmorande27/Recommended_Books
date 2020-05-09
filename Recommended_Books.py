@@ -3,9 +3,7 @@ from email.mime.text import MIMEText
 
 from bs4 import BeautifulSoup
 import urllib.request
-
 from Book import Book
-import os
 import getpass
 
 
@@ -25,7 +23,7 @@ class Library(object):
 
     def load(self):
         data = urllib.request.urlopen(self.URL).read().decode()
-        soup = BeautifulSoup(data)
+        soup = BeautifulSoup(data,"html.parser")
         links = soup('a')
         result = []
         for link in links:
@@ -33,7 +31,7 @@ class Library(object):
             if ("/libro-" in a) & (not "https://www.casadellibro.com" in a) & (not "/libro-y-pelicula" in a):
                 b = "https://www.casadellibro.com" + a
                 data = urllib.request.urlopen(b).read().decode()
-                soups = BeautifulSoup(data)
+                soups = BeautifulSoup(data,"html.parser")
                 result.append(str(soups('title')))
         count = 0
         for i in result:
@@ -41,13 +39,14 @@ class Library(object):
                 count += 1
                 self.recommended_books.append(CreateBook(i))
         self.recommended_books = list(set(self.recommended_books))
+        print("Books have been loaded")
 
     def display(self):
         if len(self.recommended_books) == 0:
-            print("No books added to the Library")
+            print("No books present to the Library")
         else:
-            for book in self.recommended_books:
-                print(book.toString())
+            for i in range(len(self.recommended_books)):
+                print(str(i+1)+". "+self.recommended_books[i].toString())
 
     def getText(self):
         resutl = ""
@@ -65,12 +64,10 @@ class Library(object):
         textFile.close()
 
     def send_email(self):
-        os.environ['MAIL_PASSWORD'] = 'Elvatera2'
-
         message = self.getText()
         gmail_user = input("User: ")
         gmail_password = getpass.getpass()
-        text_type = 'plain'  # or 'html'
+        text_type = 'plain'
         msg = MIMEText(message, text_type, 'utf-8')
         msg['Subject'] = 'Recommended books'
         msg['From'] = gmail_user

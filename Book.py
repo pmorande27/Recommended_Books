@@ -12,7 +12,7 @@ class Book(object):
                      'author_name', self.author, 'ISBN', self.isbn))
 
     def toString(self):
-        return "the book " + self.name + " was written by: " + self.author + " and Has a ISBN number of:" + self.isbn
+        return "THE BOOK " + self.name + " WAS WRITTEN BY: " + self.author + " AND HAS A ISBN NUMBER OF: " + self.isbn
 
     def formatUpload(self):
         return self.name + "," + self.author + "," + self.isbn
