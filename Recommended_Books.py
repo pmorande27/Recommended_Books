@@ -46,7 +46,7 @@ class Library(object):
             print("No books present to the Library")
         else:
             for i in range(len(self.recommended_books)):
-                print(str(i+1)+". "+self.recommended_books[i].toString())
+                print(str(i+1)+". "+str(self.recommended_books[i]))
 
     def getText(self):
         resutl = ""
@@ -54,7 +54,7 @@ class Library(object):
             resutl = "No books added to the Library"
         else:
             for book in self.recommended_books:
-                resutl += book.toString() + "\n"
+                resutl += str(book) + "\n"
         return resutl
 
     def save_Books(self):

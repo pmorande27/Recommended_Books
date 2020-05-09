@@ -11,7 +11,7 @@ class Book(object):
         return hash(('title', self.name,
                      'author_name', self.author, 'ISBN', self.isbn))
 
-    def toString(self):
+    def __str__(self):
         return "THE BOOK " + self.name + " WAS WRITTEN BY: " + self.author + " AND HAS A ISBN NUMBER OF: " + self.isbn
 
     def formatUpload(self):
