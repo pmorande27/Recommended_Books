@@ -68,7 +68,7 @@ class Library(object):
                 for b in self.recommended_books:
                     textFile.write(b.formatUpload() + "\n")
                 textFile.close()
-            except Exception:
+            except UnicodeEncodeError:
                 print(b)
 
     def send_email(self):
