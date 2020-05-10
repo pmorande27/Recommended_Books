@@ -10,7 +10,7 @@ def create_menu():
     on_menu = True
     lib = Library("https://www.casadellibro.com/libros-recomendados")
     while on_menu:
-        print("Select Option: 1 - for loading 2 - for saving 3 -for display 4 - for sending an email 5- for exit")
+        print("Select Option:\n 1 - for loading\n 2 - for saving\n 3 - for display\n 4 - for sending an email\n 5 - for exit")
 
         selection = input()
         try:

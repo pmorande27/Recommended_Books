@@ -5,6 +5,7 @@ import urllib.request
 from Book import Book
 import getpass
 from Amazon import load_amazon
+from GoodReads import load_GoodReads
 
 
 def CreateBook(title):
@@ -22,6 +23,7 @@ class Library(object):
         self.__preLoadedBooks()
 
     def load(self):
+        print("Loading La Casa del Libro")
         data = urllib.request.urlopen(self.URL).read().decode()
         soup = BeautifulSoup(data, "html.parser")
         links = soup('a')
@@ -35,11 +37,12 @@ class Library(object):
                 result.append(str(soups('title')))
         count = 0
         for i in result:
-            if not i in self.recommended_books:
+            if i not in self.recommended_books:
                 count += 1
                 self.recommended_books.append(CreateBook(i))
         self.recommended_books = list(set(self.recommended_books))
         self.recommended_books += list(set(load_amazon()))
+        self.recommended_books += load_GoodReads()
         self.recommended_books = list(set(self.recommended_books))
         print("Books have been loaded")
 
@@ -60,10 +63,13 @@ class Library(object):
         return result
 
     def save_Books(self):
-        textFile = open('recommendedbooks.txt', 'w')
-        for b in self.recommended_books:
-            textFile.write(b.formatUpload() + "\n")
-        textFile.close()
+        with open('recommendedbooks.txt', "w", encoding="utf-8") as textFile:
+            try:
+                for b in self.recommended_books:
+                    textFile.write(b.formatUpload() + "\n")
+                textFile.close()
+            except Exception:
+                print(b)
 
     def send_email(self):
         message = self.getText()
