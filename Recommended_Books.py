@@ -1,10 +1,10 @@
 import smtplib
 from email.mime.text import MIMEText
-
 from bs4 import BeautifulSoup
 import urllib.request
 from Book import Book
 import getpass
+from Amazon import load_amazon
 
 
 def CreateBook(title):
@@ -12,7 +12,7 @@ def CreateBook(title):
     name = list_of_elements[0].replace("[<title>", "").strip()
     author = list_of_elements[1].strip()
     ISBN = list_of_elements[2].replace("</title>]", "").replace("Comprar libro ", "").strip()
-    return Book(name, author, ISBN)
+    return Book(name, [author], ISBN)
 
 
 class Library(object):
@@ -23,7 +23,7 @@ class Library(object):
 
     def load(self):
         data = urllib.request.urlopen(self.URL).read().decode()
-        soup = BeautifulSoup(data,"html.parser")
+        soup = BeautifulSoup(data, "html.parser")
         links = soup('a')
         result = []
         for link in links:
@@ -31,13 +31,15 @@ class Library(object):
             if ("/libro-" in a) & (not "https://www.casadellibro.com" in a) & (not "/libro-y-pelicula" in a):
                 b = "https://www.casadellibro.com" + a
                 data = urllib.request.urlopen(b).read().decode()
-                soups = BeautifulSoup(data,"html.parser")
+                soups = BeautifulSoup(data, "html.parser")
                 result.append(str(soups('title')))
         count = 0
         for i in result:
             if not i in self.recommended_books:
                 count += 1
                 self.recommended_books.append(CreateBook(i))
+        self.recommended_books = list(set(self.recommended_books))
+        self.recommended_books += list(set(load_amazon()))
         self.recommended_books = list(set(self.recommended_books))
         print("Books have been loaded")
 
@@ -46,16 +48,16 @@ class Library(object):
             print("No books present to the Library")
         else:
             for i in range(len(self.recommended_books)):
-                print(str(i+1)+". "+str(self.recommended_books[i]))
+                print(str(i + 1) + ". " + str(self.recommended_books[i]))
 
     def getText(self):
-        resutl = ""
+        result = ""
         if len(self.recommended_books) == 0:
-            resutl = "No books added to the Library"
+            result = "No books added to the Library"
         else:
             for book in self.recommended_books:
-                resutl += str(book) + "\n"
-        return resutl
+                result += str(book) + "\n"
+        return result
 
     def save_Books(self):
         textFile = open('recommendedbooks.txt', 'w')
@@ -83,4 +85,4 @@ class Library(object):
         for b in books:
             content = b.split(",")
             if len(content) == 3:
-                self.recommended_books.append(Book(content[0], content[1].strip(), content[2].strip()))
+                self.recommended_books.append(Book(content[0], content[1].strip().split("&"), content[2].strip()))

@@ -39,6 +39,7 @@ class myException(Exception):
             self.message = "This is a special Exception"
 
     def __str__(self):
+
         return 'MyCustomError, {0} '.format(self.message)
 
 
